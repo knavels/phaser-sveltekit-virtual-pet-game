@@ -1,5 +1,4 @@
 import { stat, uiBlocked, type Stat, selected } from '$lib/stores';
-import { get } from 'svelte/store';
 
 let scene: GameScene;
 
