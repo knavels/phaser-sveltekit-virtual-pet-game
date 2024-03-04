@@ -44,10 +44,19 @@ export default class PreloaderScene extends Phaser.Scene {
     }
 
     create() {
+        // animation
+        this.anims.create({
+            key: 'funny-faces',
+            frames: this.anims.generateFrameNames('pet', { frames: [1, 2, 3] }),
+            frameRate: 7,
+            yoyo: true,
+            repeat: 0,
+        });
+
         this.scene.get('splash').events.emit('set_loader_progress', 1);
         this.time.delayedCall(50, () => {
             this.scene.stop('splash');
-            this.scene.start('main');
+            this.scene.start('home');
         });
     }
 }

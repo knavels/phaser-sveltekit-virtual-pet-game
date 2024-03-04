@@ -5,6 +5,7 @@
 	import ToolBox from './Toolbox.svelte';
 	import { config } from '$lib/phaser';
 	import Hud from './Hud.svelte';
+	import { state } from '$stores/game';
 
 	let gameContainer: HTMLCanvasElement;
 
@@ -16,13 +17,19 @@
 
 <!-- Parent container with relative positioning -->
 <div class="container">
-	<div class="toolbox">
-		<ToolBox />
-	</div>
+	{#if $state === 'home'}
+		<div class="welcome">
+			<h2>VIRTUAL PET</h2>
+		</div>
+	{:else}
+		<div class="toolbox">
+			<ToolBox />
+		</div>
 
-	<div class="hud">
-		<Hud />
-	</div>
+		<div class="hud">
+			<Hud />
+		</div>
+	{/if}
 
 	<!-- Canvas container -->
 	<canvas bind:this={gameContainer} width={window.innerWidth} height={window.innerHeight} />
@@ -33,6 +40,8 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
+		max-width: 360px;
+		max-height: 640px;
 		user-select: none; /* Disable text selection */
 	}
 
@@ -48,13 +57,14 @@
 		padding: 0 10px; /* Padding for text */
 		min-height: 30px; /* Minimum height */
 		max-height: 120px; /* Maximum height, adjust as needed */
-		bottom: 100px; /* 100px above the bottom */
+		bottom: 50px; /* 100px above the bottom */
 		left: 50%; /* Start from the middle of the container */
 		transform: translateX(-50%); /* Center it by moving it left by half of its width */
 	}
 
 	.container .hud {
 		position: absolute;
+		width: 100%;
 		z-index: 1;
 		color: white;
 		display: flex;
@@ -62,8 +72,25 @@
 		align-items: center;
 		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow for contrast */
 		background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-		padding: 0 10px; /* Padding for text */
 		min-height: 30px; /* Minimum height */
 		max-height: 40px; /* Maximum height, adjust as needed */
+	}
+
+	.container .welcome {
+		position: absolute;
+		width: 100%;
+		z-index: 1;
+		color: white;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow for contrast */
+		background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+		top: 50%; /* Center vertically */
+		left: 50%; /* Center horizontally */
+		transform: translate(
+			-50%,
+			-50%
+		); /* Adjust the position to truly center based on its own size */
 	}
 </style>

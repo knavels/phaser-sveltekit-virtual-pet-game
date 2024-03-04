@@ -38,3 +38,5 @@ export default createStatStore();
 export const uiBlocked = writable<boolean>(false);
 
 export const selected = writable<string>('');
+
+export const state = writable<string>('home');

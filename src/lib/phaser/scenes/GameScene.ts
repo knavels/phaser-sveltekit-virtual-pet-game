@@ -1,4 +1,5 @@
 import { stat, uiBlocked, type Stat, selected } from '$lib/stores';
+import type { Unsubscriber } from 'svelte/store';
 
 type GameConfigType = {
     decayRate: Stat,
@@ -45,17 +46,18 @@ export default class GameScene extends Phaser.Scene {
 
     private isGameOver: boolean = false;
 
+    private selectedUnsub!: Unsubscriber;
+    private statUnsub!: Unsubscriber;
+
     constructor() {
-        super('main');
+        super('game');
     }
 
     create() {
-        uiBlocked.set(false);
-        selected.set('');
-        stat.reset();
+        this.isGameOver = false;
 
-        selected.subscribe(item => this.selectedItem = item);
-        stat.subscribe(item => {
+        this.selectedUnsub = selected.subscribe(item => this.selectedItem = item);
+        this.statUnsub = stat.subscribe(item => {
             if (item.health < 0) {
                 stat.zeroTheHealth();
                 this.isGameOver = true;
@@ -78,15 +80,6 @@ export default class GameScene extends Phaser.Scene {
         bg.on('pointerdown', this.placeItem, this);
 
         this.pet = this.add.sprite(100, 200, 'pet', 0).setInteractive();
-
-        // animation
-        this.anims.create({
-            key: 'funny-faces',
-            frames: this.anims.generateFrameNames('pet', { frames: [1, 2, 3] }),
-            frameRate: 7,
-            yoyo: true,
-            repeat: 0,
-        });
 
         // event listener for when spritesheet animation is completed
         this.pet.on('animationcomplete', () => {
@@ -140,7 +133,7 @@ export default class GameScene extends Phaser.Scene {
     private placeItem(_pointer: any, localX: number, localY: number) {
         if (this.selectedItem === '') return;
 
-        if (localY > 480) return;
+        if (localY > 520) return;
 
         // create a new item in the position player clicked
         let newItem = this.add.sprite(localX, localY, this.selectedItem);
@@ -180,11 +173,14 @@ export default class GameScene extends Phaser.Scene {
         uiBlocked.set(true);
         this.pet.setFrame(4);
 
+        this.statUnsub();
+        this.selectedUnsub();
+
         this.time.addEvent({
             delay: 2000,
             repeat: 0,
             callback: () => {
-                this.scene.restart();
+                this.scene.start('home');
             }
         })
     }

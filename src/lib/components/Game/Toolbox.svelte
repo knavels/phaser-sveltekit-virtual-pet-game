@@ -30,19 +30,19 @@
 	.buttons {
 		display: flex;
 		justify-content: space-around;
-		margin: 20px 0;
+		margin: 10px 0;
 	}
 
 	.clickable-image {
-		width: 100px;
-		height: 100px;
+		width: 50px;
+		height: 50px;
 		opacity: 1;
 		transition: opacity 0.3s ease;
 	}
 
 	.clickable-image-selected {
-		width: 100px;
-		height: 100px;
+		width: 50px;
+		height: 50px;
 		opacity: 0.5;
 	}
 
