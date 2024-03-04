@@ -18,6 +18,11 @@ const toyStat: Stat = {
     fun: 15,
 };
 
+const rotateStat: Stat = {
+    health: 0,
+    fun: 20,
+};
+
 const emptyStat: Stat = {
     health: 0,
     fun: 0,
@@ -60,10 +65,20 @@ export default class GameScene extends Phaser.Scene {
         selected.selectRotate();
         uiBlocked.set(true);
 
-        setTimeout(() => {
-            this.readyUI();
-        }, 2000);
+        // rotation tween
+        let rotationTween = this.tweens.add({
+            targets: this.pet,
+            duration: 1600,
+            angle: 720,
+            pause: false,
+            onComplete: (tween, sprites) => {
+                // increase fun
+                stat.apply(rotateStat);
 
+                // set UI to ready
+                this.readyUI();
+            }
+        });
     }
 
     public pickItem(item: string, stat: Stat) {
