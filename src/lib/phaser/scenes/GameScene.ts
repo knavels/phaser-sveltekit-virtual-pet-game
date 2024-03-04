@@ -78,7 +78,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     public rotatePet() {
-        selected.selectRotate();
+        selected.select('rotate');
         uiBlocked.set(true);
 
         // rotation tween
@@ -95,7 +95,7 @@ export default class GameScene extends Phaser.Scene {
 
     public pickItem(item: string, stat: Stat) {
         this.currentStat = stat;
-        selected.selectItem(item);
+        selected.select(item);
     }
 
     private placeItem(_pointer: any, localX: number, localY: number) {

@@ -35,11 +35,7 @@ function createSelectedItemStore() {
 
     return {
         subscribe,
-        selectItem: (item: string) => set(item),
-        selectApple: () => set('apple'),
-        selectCandy: () => set('candy'),
-        selectToy: () => set('toy'),
-        selectRotate: () => set('rotate'),
+        select: (item: string) => set(item),
         reset: () => set(''),
     }
 }
