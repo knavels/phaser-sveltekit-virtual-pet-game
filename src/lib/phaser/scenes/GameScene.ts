@@ -1,43 +1,73 @@
 import { stat, uiBlocked, type Stat, selected } from '$lib/stores';
 
+type GameConfigType = {
+    decayRate: Stat,
+    appleStat: Stat,
+    candyStat: Stat,
+    toyStat: Stat,
+    rotateStat: Stat,
+};
+
+const gameConfig: GameConfigType = {
+    decayRate: {
+        health: -5,
+        fun: -2
+    },
+
+    appleStat: {
+        health: 20,
+        fun: 0,
+    },
+
+    candyStat: {
+        health: -10,
+        fun: 10,
+    },
+
+    toyStat: {
+        health: 0,
+        fun: 15,
+    },
+
+    rotateStat: {
+        health: 0,
+        fun: 20,
+    },
+};
+
 let sceneRef: GameScene;
-
-const appleStat: Stat = {
-    health: 20,
-    fun: 0,
-};
-
-const candyStat: Stat = {
-    health: -10,
-    fun: 10,
-};
-
-const toyStat: Stat = {
-    health: 0,
-    fun: 15,
-};
-
-const rotateStat: Stat = {
-    health: 0,
-    fun: 20,
-};
-
-const emptyStat: Stat = {
-    health: 0,
-    fun: 0,
-};
 
 export default class GameScene extends Phaser.Scene {
     private pet!: Phaser.GameObjects.Sprite;
     private selectedItem: string = '';
-    private currentStat: Stat = emptyStat;
+    private currentStat: Stat = { health: 0, fun: 0 };
+    private timedEventStats!: Phaser.Time.TimerEvent;
+
+    private isGameOver: boolean = false;
 
     constructor() {
         super('main');
     }
 
     create() {
+        uiBlocked.set(false);
+        selected.set('');
+        stat.reset();
+
         selected.subscribe(item => this.selectedItem = item);
+        stat.subscribe(item => {
+            if (item.health < 0) {
+                stat.zeroTheHealth();
+                this.isGameOver = true;
+            }
+            if (item.fun < 0) {
+                stat.zeroTheFun();
+                this.isGameOver = true;
+            }
+
+            // check if the game ended
+            if (this.isGameOver) this.gameOver();
+        })
 
         sceneRef = this;
 
@@ -75,6 +105,15 @@ export default class GameScene extends Phaser.Scene {
             gameObject.x = dragX;
             gameObject.y = dragY;
         });
+
+        // decay of health and fun over time
+        this.timedEventStats = this.time.addEvent({
+            delay: 1000,
+            repeat: -1, // forever
+            callback: () => {
+                stat.apply(gameConfig.decayRate);
+            }
+        });
     }
 
     public rotatePet() {
@@ -88,7 +127,7 @@ export default class GameScene extends Phaser.Scene {
             angle: 720,
             pause: false,
             onComplete: (tween, sprites) => {
-                this.applyStatAndUnfreezeUI(rotateStat);
+                this.applyStatAndUnfreezeUI(gameConfig.rotateStat);
             }
         });
     }
@@ -126,25 +165,39 @@ export default class GameScene extends Phaser.Scene {
     private readyUI() {
         uiBlocked.set(false);
         selected.set('');
-        this.currentStat = emptyStat;
+        this.currentStat = { health: 0, fun: 0 };
     }
 
-    private applyStatAndUnfreezeUI(newStat: Stat | null = null) {
-        stat.apply(newStat ?? this.currentStat);
+    private applyStatAndUnfreezeUI(value: Stat | null = null) {
+        stat.apply(value ?? this.currentStat);
 
         // set UI to ready
         this.readyUI();
+    }
+
+    private gameOver() {
+        this.timedEventStats.destroy();
+        uiBlocked.set(true);
+        this.pet.setFrame(4);
+
+        this.time.addEvent({
+            delay: 2000,
+            repeat: 0,
+            callback: () => {
+                this.scene.restart();
+            }
+        })
     }
 }
 
 
 export function handleInGameActions(action: string) {
     if (action === 'apple') {
-        sceneRef.pickItem(action, appleStat);
+        sceneRef.pickItem(action, gameConfig.appleStat);
     } else if (action === 'candy') {
-        sceneRef.pickItem(action, candyStat);
+        sceneRef.pickItem(action, gameConfig.candyStat);
     } else if (action === 'toy') {
-        sceneRef.pickItem(action, toyStat);
+        sceneRef.pickItem(action, gameConfig.toyStat);
     } else if (action === 'rotate') {
         sceneRef.rotatePet();
     }

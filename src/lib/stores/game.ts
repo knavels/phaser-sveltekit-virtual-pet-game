@@ -11,10 +11,19 @@ const stat = writable<Stat>({
 });
 
 function createStatStore() {
-    const { subscribe, update } = stat;
+    const { subscribe, update, set } = stat;
 
     return {
         subscribe,
+        reset: () => set({ health: 100, fun: 100 }),
+        zeroTheHealth: () => update(s => {
+            s.health = 0;
+            return { ...s };
+        }),
+        zeroTheFun: () => update(s => {
+            s.fun = 0;
+            return { ...s };
+        }),
         apply: (statUpdate: Stat) => update(s => {
             s.health += statUpdate.health;
             s.fun += statUpdate.fun;

@@ -20,6 +20,7 @@
 				alt="Image"
 				class:clickable-image-selected={$selected === button.action}
 				class:clickable-image={$selected !== button.action}
+				draggable="false"
 			/>
 		</button>
 	{/each}
