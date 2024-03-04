@@ -1,4 +1,4 @@
-import { stat, type Stat } from '$lib/stores';
+import { stat, uiBlocked, type Stat, selected } from '$lib/stores';
 import { get } from 'svelte/store';
 
 let scene: GameScene;
@@ -18,25 +18,30 @@ const toyStat: Stat = {
     fun: 15,
 };
 
+const emptyStat: Stat = {
+    health: 0,
+    fun: 0,
+};
+
 export default class GameScene extends Phaser.Scene {
     private pet!: Phaser.GameObjects.Sprite;
+    private selectedItem: string = '';
+    private currentStat: Stat = emptyStat;
 
     constructor() {
         super('main');
     }
 
     create() {
-        // console.log('hello world'); // todo:: remove me
-        // this.updateNumSpawns(get(logoCount));
-        // logoCount.subscribe((count) => {
-        //     this.updateNumSpawns(count);
-        // });
-        // this.matter.add.mouseSpring();
+        selected.subscribe(item => this.selectedItem = item);
 
         scene = this;
 
         // background
-        this.add.sprite(0, 0, 'backyard').setOrigin(0, 0);
+        let bg = this.add.sprite(0, 0, 'backyard').setOrigin(0, 0).setInteractive();
+
+        // event listener for the background
+        bg.on('pointerdown', this.placeItem, this);
 
         this.pet = this.add.sprite(100, 200, 'pet', 0).setInteractive();
 
@@ -51,27 +56,50 @@ export default class GameScene extends Phaser.Scene {
         });
     }
 
-    public movePet() {
-        this.pet.x += 1;
-    }
-
     public rotatePet() {
-        alert('rotating the pet');
+        selected.selectRotate();
+        uiBlocked.set(true);
+
+        setTimeout(() => {
+            this.readyUI();
+        }, 2000);
+
     }
 
-    public pickItem(item: string) {
-        alert('we are picking up something ' + item);
+    public pickItem(item: string, stat: Stat) {
+        this.currentStat = stat;
+        selected.selectItem(item);
+    }
+
+    private placeItem(_pointer: any, localX: number, localY: number) {
+        if (this.selectedItem === '') return;
+
+        if (localY > 480) return;
+
+        // create a new item in the position player clicked
+        let newItem = this.add.sprite(localX, localY, this.selectedItem);
+
+        stat.apply(this.currentStat);
+
+        // clear the ui
+        this.readyUI();
+    }
+
+    private readyUI() {
+        uiBlocked.set(false);
+        selected.reset();
+        this.currentStat = emptyStat;
     }
 }
 
 
 export function handleInGameActions(action: string) {
     if (action === 'apple') {
-        scene.pickItem(action);
+        scene.pickItem(action, appleStat);
     } else if (action === 'candy') {
-        scene.pickItem(action);
+        scene.pickItem(action, candyStat);
     } else if (action === 'toy') {
-        scene.pickItem(action);
+        scene.pickItem(action, toyStat);
     } else if (action === 'rotate') {
         scene.rotatePet();
     }
