@@ -10,15 +10,42 @@
 	onMount(async () => {
 		config.canvas = gameContainer;
 		const game = new Phaser.Game(config);
-
-		window.addEventListener('resize', () => {
-			game.scale.resize(window.innerWidth, window.innerHeight);
-		});
 	});
 </script>
 
-<div>
+<!-- Parent container with relative positioning -->
+<div class="container">
+	<!-- Hud component with absolute positioning to overlay on top of the canvas -->
+	<div class="hud">
+		<Hud />
+	</div>
+
+	<!-- Canvas container -->
 	<canvas bind:this={gameContainer} width={window.innerWidth} height={window.innerHeight} />
 </div>
 
-<Hud />
+<style>
+	.container {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		user-select: none; /* Disable text selection */
+	}
+
+	.container .hud {
+		position: absolute;
+		z-index: 1;
+		color: white;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow for contrast */
+		background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+		padding: 0 10px; /* Padding for text */
+		min-height: 30px; /* Minimum height */
+		max-height: 120px; /* Maximum height, adjust as needed */
+		bottom: 100px; /* 100px above the bottom */
+		left: 50%; /* Start from the middle of the container */
+		transform: translateX(-50%); /* Center it by moving it left by half of its width */
+	}
+</style>

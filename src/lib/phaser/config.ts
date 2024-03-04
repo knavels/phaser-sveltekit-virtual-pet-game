@@ -6,22 +6,11 @@ import GameScene from './scenes/GameScene';
 
 export const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.WEBGL,
-    width: window.innerWidth,
-    height: window.innerHeight,
-    physics: {
-        default: 'matter',
-        matter: {
-            autoUpdate: false,
-            debug: false,
-            setBounds: true,
-            gravity: {
-                x: 0,
-                y: 1
-            }
-        }
-    },
-    pixelArt: true,
-    transparent: true,
+    width: 360,
+    height: 640,
+    title: 'Virtual Pet',
+    pixelArt: false,
+    backgroundColor: 'ffffff',
     scale: {
         mode: Phaser.Scale.NONE
     },

@@ -1,3 +1,11 @@
 import { writable } from 'svelte/store';
 
-export const logoCount = writable<number>(3);
+export interface Stat {
+    health: number,
+    fun: number,
+}
+
+export const stat = writable<Stat>({
+    health: 100,
+    fun: 100,
+});

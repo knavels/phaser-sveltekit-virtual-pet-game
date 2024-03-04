@@ -1,72 +1,78 @@
-import { logoCount } from '$lib/stores';
+import { stat, type Stat } from '$lib/stores';
 import { get } from 'svelte/store';
 
+let scene: GameScene;
+
+const appleStat: Stat = {
+    health: 20,
+    fun: 0,
+};
+
+const candyStat: Stat = {
+    health: -10,
+    fun: 10,
+};
+
+const toyStat: Stat = {
+    health: 0,
+    fun: 15,
+};
+
 export default class GameScene extends Phaser.Scene {
-    private logos: Phaser.Physics.Matter.Sprite[] = [];
+    private pet!: Phaser.GameObjects.Sprite;
+
     constructor() {
         super('main');
     }
 
     create() {
-        console.log('hello world'); // todo:: remove me
-        this.updateNumSpawns(get(logoCount));
-        logoCount.subscribe((count) => {
-            this.updateNumSpawns(count);
+        // console.log('hello world'); // todo:: remove me
+        // this.updateNumSpawns(get(logoCount));
+        // logoCount.subscribe((count) => {
+        //     this.updateNumSpawns(count);
+        // });
+        // this.matter.add.mouseSpring();
+
+        scene = this;
+
+        // background
+        this.add.sprite(0, 0, 'backyard').setOrigin(0, 0);
+
+        this.pet = this.add.sprite(100, 200, 'pet', 0).setInteractive();
+
+        // make pet draggable
+        this.input.setDraggable(this.pet);
+
+        // follow the pointer (mouse/finger) when dragging
+        this.input.on('drag', function (_pointer: any, gameObject: Phaser.GameObjects.Sprite, dragX: number, dragY: number) {
+            // make sprite be located at the cordinates of the dragging
+            gameObject.x = dragX;
+            gameObject.y = dragY;
         });
-        this.matter.add.mouseSpring();
     }
 
-    private updateNumSpawns(count: number) {
-        if (count > this.logos.length) {
-            for (let i = 0; i < count - this.logos.length; i++) {
-                this.spawnLogo();
-            }
-        } else if (count < this.logos.length) {
-            for (let i = 0; i < this.logos.length - count; i++) {
-                this.removeLogo();
-            }
-        }
+    public movePet() {
+        this.pet.x += 1;
     }
 
-    private spawnLogo() {
-        const scale = 0.25;
-
-        // Create the sprite with Matter physics enabled
-        const logo = this.matter.add.sprite(100, 100, 'logo').setScale(scale);
-
-        // Calculate the new dimensions based on the scale
-        const newWidth = logo.width * scale;
-        const newHeight = logo.height * scale;
-
-        // Directly use Phaser's method to create a rectangle body and set it to the sprite
-        const newBody = this.matter.bodies.rectangle(100, 100, newWidth, newHeight);
-
-        // Since the newBody creation was incorrect in the initial example, let's adjust it
-        logo.setExistingBody(newBody).setPosition(100, 100);
-
-        this.logos.push(logo);
+    public rotatePet() {
+        alert('rotating the pet');
     }
 
-    private removeLogo() {
-        const logo = this.logos.pop();
-        if (logo) {
-            logo.destroy();
-        }
+    public pickItem(item: string) {
+        alert('we are picking up something ' + item);
     }
+}
 
-    update(time: number, delta: number): void {
-        this.updatePhysics(delta);
-    }
 
-    // ⚠️ Do not edit ⚠️
-    private physicsClock = 0;
-    private readonly fps = 144;
-    updatePhysics(delta: number) {
-        this.physicsClock += delta;
-        const frameLengthMs = 1000 / this.fps;
-        while (this.physicsClock > frameLengthMs) {
-            this.physicsClock -= frameLengthMs;
-            this.matter.world.step(frameLengthMs);
-        }
+export function handleInGameActions(action: string) {
+    if (action === 'apple') {
+        scene.pickItem(action);
+    } else if (action === 'candy') {
+        scene.pickItem(action);
+    } else if (action === 'toy') {
+        scene.pickItem(action);
+    } else if (action === 'rotate') {
+        scene.rotatePet();
     }
 }
