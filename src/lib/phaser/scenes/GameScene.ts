@@ -1,6 +1,6 @@
 import { stat, uiBlocked, type Stat, selected } from '$lib/stores';
 
-let scene: GameScene;
+let sceneRef: GameScene;
 
 const appleStat: Stat = {
     health: 20,
@@ -39,7 +39,7 @@ export default class GameScene extends Phaser.Scene {
     create() {
         selected.subscribe(item => this.selectedItem = item);
 
-        scene = this;
+        sceneRef = this;
 
         // background
         let bg = this.add.sprite(0, 0, 'backyard').setOrigin(0, 0).setInteractive();
@@ -48,6 +48,23 @@ export default class GameScene extends Phaser.Scene {
         bg.on('pointerdown', this.placeItem, this);
 
         this.pet = this.add.sprite(100, 200, 'pet', 0).setInteractive();
+
+        // animation
+        this.anims.create({
+            key: 'funny-faces',
+            frames: this.anims.generateFrameNames('pet', { frames: [1, 2, 3] }),
+            frameRate: 7,
+            yoyo: true,
+            repeat: 0,
+        });
+
+        // event listener for when spritesheet animation is completed
+        this.pet.on('animationcomplete', () => {
+            this.applyStatAndUnfreezeUI();
+
+            this.pet.setFrame(0);
+        });
+
 
         // make pet draggable
         this.input.setDraggable(this.pet);
@@ -98,8 +115,10 @@ export default class GameScene extends Phaser.Scene {
             y: newItem.y,
             paused: false,
             onComplete: (tween, sprites) => {
-                this.applyStatAndUnfreezeUI();
                 newItem.destroy();
+
+                // play spritesheet animation
+                this.pet.play('funny-faces');
             }
         });
     }
@@ -121,12 +140,12 @@ export default class GameScene extends Phaser.Scene {
 
 export function handleInGameActions(action: string) {
     if (action === 'apple') {
-        scene.pickItem(action, appleStat);
+        sceneRef.pickItem(action, appleStat);
     } else if (action === 'candy') {
-        scene.pickItem(action, candyStat);
+        sceneRef.pickItem(action, candyStat);
     } else if (action === 'toy') {
-        scene.pickItem(action, toyStat);
+        sceneRef.pickItem(action, toyStat);
     } else if (action === 'rotate') {
-        scene.rotatePet();
+        sceneRef.rotatePet();
     }
 }
