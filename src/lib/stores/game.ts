@@ -28,16 +28,4 @@ export default createStatStore();
 
 export const uiBlocked = writable<boolean>(false);
 
-const selectedItem = writable<string>('');
-
-function createSelectedItemStore() {
-    const { subscribe, set } = selectedItem;
-
-    return {
-        subscribe,
-        select: (item: string) => set(item),
-        reset: () => set(''),
-    }
-}
-
-export const selected = createSelectedItemStore();
+export const selected = writable<string>('');
