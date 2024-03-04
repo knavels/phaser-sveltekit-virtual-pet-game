@@ -1,4 +1,5 @@
 import { stat, uiBlocked, type Stat, selected } from '$lib/stores';
+import { state } from '$stores/game';
 import type { Unsubscriber } from 'svelte/store';
 
 type GameConfigType = {
@@ -93,7 +94,9 @@ export default class GameScene extends Phaser.Scene {
         this.input.setDraggable(this.pet);
 
         // follow the pointer (mouse/finger) when dragging
-        this.input.on('drag', function (_pointer: any, gameObject: Phaser.GameObjects.Sprite, dragX: number, dragY: number) {
+        this.input.on('drag', (_pointer: any, gameObject: Phaser.GameObjects.Sprite, dragX: number, dragY: number) => {
+            if (this.isGameOver) return;
+
             // make sprite be located at the cordinates of the dragging
             gameObject.x = dragX;
             gameObject.y = dragY;
@@ -169,6 +172,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     private gameOver() {
+        state.set('game-over');
         this.timedEventStats.destroy();
         uiBlocked.set(true);
         this.pet.setFrame(4);

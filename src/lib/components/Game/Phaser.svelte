@@ -18,8 +18,12 @@
 <!-- Parent container with relative positioning -->
 <div class="container">
 	{#if $state === 'home'}
-		<div class="welcome">
-			<h2>VIRTUAL PET</h2>
+		<div class="message">
+			<h2>😁 VIRTUAL PET</h2>
+		</div>
+	{:else if $state === 'game-over'}
+		<div class="message">
+			<h2>❌ GAME OVER ❌</h2>
 		</div>
 	{:else}
 		<div class="toolbox">
@@ -76,7 +80,7 @@
 		max-height: 40px; /* Maximum height, adjust as needed */
 	}
 
-	.container .welcome {
+	.container .message {
 		position: absolute;
 		width: 100%;
 		z-index: 1;
