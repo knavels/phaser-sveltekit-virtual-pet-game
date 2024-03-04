@@ -64,6 +64,6 @@
 		background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
 		padding: 0 10px; /* Padding for text */
 		min-height: 30px; /* Minimum height */
-		max-height: 35px; /* Maximum height, adjust as needed */
+		max-height: 40px; /* Maximum height, adjust as needed */
 	}
 </style>
