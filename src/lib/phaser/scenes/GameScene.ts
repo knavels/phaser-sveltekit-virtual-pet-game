@@ -72,11 +72,7 @@ export default class GameScene extends Phaser.Scene {
             angle: 720,
             pause: false,
             onComplete: (tween, sprites) => {
-                // increase fun
-                stat.apply(rotateStat);
-
-                // set UI to ready
-                this.readyUI();
+                this.applyStatAndUnfreezeUI(rotateStat);
             }
         });
     }
@@ -94,16 +90,32 @@ export default class GameScene extends Phaser.Scene {
         // create a new item in the position player clicked
         let newItem = this.add.sprite(localX, localY, this.selectedItem);
 
-        stat.apply(this.currentStat);
+        uiBlocked.set(true);
 
-        // clear the ui
-        this.readyUI();
+        let petTween = this.tweens.add({
+            targets: this.pet,
+            duration: 500,
+            x: newItem.x,
+            y: newItem.y,
+            paused: false,
+            onComplete: (tween, sprites) => {
+                this.applyStatAndUnfreezeUI();
+                newItem.destroy();
+            }
+        });
     }
 
     private readyUI() {
         uiBlocked.set(false);
         selected.reset();
         this.currentStat = emptyStat;
+    }
+
+    private applyStatAndUnfreezeUI(newStat: Stat | null = null) {
+        stat.apply(newStat ?? this.currentStat);
+
+        // set UI to ready
+        this.readyUI();
     }
 }
 
