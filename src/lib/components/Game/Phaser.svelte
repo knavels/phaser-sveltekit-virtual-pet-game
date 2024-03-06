@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Phaser from 'phaser';
 
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import ToolBox from './Toolbox.svelte';
 	import { config } from '$lib/phaser';
 	import Hud from './Hud.svelte';
@@ -9,9 +9,15 @@
 
 	let gameContainer: HTMLCanvasElement;
 
+	let game: Phaser.Game;
+
 	onMount(async () => {
 		config.canvas = gameContainer;
-		const game = new Phaser.Game(config);
+		game = new Phaser.Game(config);
+	});
+
+	onDestroy(async () => {
+		game.destroy(false, false);
 	});
 </script>
 
